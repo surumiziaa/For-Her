@@ -1,25 +1,129 @@
-import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-class EditAddress extends StatefulWidget {
-  const EditAddress({super.key});
+import 'package:google_fonts/google_fonts.dart';
+class Addresspage extends StatefulWidget {
+  const Addresspage({super.key});
 
   @override
-  State<EditAddress> createState() => _AddressState();
+  State<Addresspage> createState() => _AddresspageState();
 }
 
-class _AddressState extends State<EditAddress> {
+class _AddresspageState extends State<Addresspage> {
+  final CollectionReference address = FirebaseFirestore.instance.collection('Address');
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Add New Address',
+            style: TextStyle(
+              fontSize:25,
+              fontFamily: GoogleFonts.playfairDisplay().fontFamily,
+              color: const Color(0xff00295d),
+            ),
+          ),
+        ),
+        body: Column(
+          children: [
+            SizedBox(height: 10,),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                child: ListTile(
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>AddAddress()));
+                  },
+                  leading:Icon(Icons.add_circle_outline),
+                  title:Text('Add Address',
+                  style: TextStyle(
+                    fontSize: 18
+                  ),),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                child:Container(
+                  height:250,
+                  width: 500,
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        StreamBuilder(
+                          stream:address.snapshots(),
+                          builder: (context, snapshot) {
+                            if(snapshot.hasData) {
+                              return ListView.builder(
+                                itemCount: snapshot.data!.docs.length,
+                               itemBuilder:(context, int index) {
+                                 final  DocumentSnapshot snap = snapshot.data!.docs[index];
+                                  return Column(
+                                    children: [
+                                      SizedBox(height: 20,),
+                                      Text(snap['name'],
+                                        style: TextStyle(
+                                            fontSize: 18
+                                        ),),
+                                      SizedBox(height: 20,),
+                                      Text("Address :",
+                                        style: TextStyle(
+                                            fontSize: 18
+                                        ),),
+                                      SizedBox(height: 20,),
+                                      Text("PinCode :",
+                                        style: TextStyle(
+                                            fontSize: 18
+                                        ),),
+                                      SizedBox(height: 20,),
+                                      Text("Mobile  :",
+                                        style: TextStyle(
+                                            fontSize: 18
+                                        ),),
+
+                                    ],
+                                  );
+                                }
+                              );
+                            }
+                            return CircularProgressIndicator();
+                          }
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+class AddAddress extends StatefulWidget {
+  const AddAddress({super.key});
+
+  @override
+  State<AddAddress> createState() => _AddAddressState();
+}
+
+class _AddAddressState extends State<AddAddress> {
   final CollectionReference address = FirebaseFirestore.instance.collection('Address');
 
-  Future updateaddres(docid) async{
+  Future addaddres() async{
     final data ={
       "name":name.text,
       'address':adress.text,
       'phone':phone.text,
       'pincode':pin.text
     };
-    await address.doc(docid).update(data);
+    await address.add(data);
   }
 
   TextEditingController name = TextEditingController();
@@ -29,12 +133,6 @@ class _AddressState extends State<EditAddress> {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map;
-    name.text =args['EdName'];
-    phone.text = args['EdPhone'].toString();
-    adress.text=args['Edadress'];
-    pin.text= args['EdPin'];
-    var docid = args['id'];
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -240,7 +338,7 @@ class _AddressState extends State<EditAddress> {
                 color:Color(0xff8a92cd),
                 onPressed: (){
                   setState(() {
-                    updateaddres(docid);
+                    addaddres();
                     Navigator.pop(context);
                   });
                 },

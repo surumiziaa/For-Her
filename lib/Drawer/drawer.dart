@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:for_her/MyCart/Mycart.dart';
+import 'package:for_her/Adress/addresspage.dart';
 import 'package:for_her/Profile/profilepage.dart';
 import 'package:for_her/UrlLauncher/phone.dart';
 import 'package:for_her/Wishlist/Wistlistpage.dart';
+import 'package:for_her/orders/view_orders.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,6 +43,9 @@ class _DDState extends State<Drawerset> {
                 ],
               ),),
           PopupMenuItem(
+            onTap: (){
+              Navigator.push(context,MaterialPageRoute(builder: (context)=>OrderScreen()));
+            },
               child:Row(
                 children: [
                   Icon(MdiIcons.package,
@@ -67,6 +71,9 @@ class _DDState extends State<Drawerset> {
             ],
           ),),
           PopupMenuItem(
+            onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>Addresspage()));
+            },
               child:Row(
                 children: [
                   Icon(Icons.location_city,
@@ -106,8 +113,31 @@ class _DDState extends State<Drawerset> {
               ],
             ),),
           PopupMenuItem(
-            onTap: (){
-              signout();
+            onTap: ()async {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return Card(
+                    color: Colors.grey,
+                    elevation: 20,
+                    child: AlertDialog(
+                      backgroundColor: Colors.white,
+                      title: const Text("About"),
+                      content: Text("Do you want to logout\nthis account?"),
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("No")),
+                        TextButton(
+                            onPressed: (){
+                            signout();
+                            },
+                            child: const Text("Yes")),
+                      ],
+                    ),
+                  );
+                },
+              );
             },
             child:Row(
             children: [
@@ -116,9 +146,23 @@ class _DDState extends State<Drawerset> {
               Text('Logout',
                 style: TextStyle(
                     fontFamily: GoogleFonts.lora().fontFamily
-                ),)
+                ),),
             ],
-          ),)
+          ),),
+          PopupMenuItem(
+            onTap: (){
+              // Navigator.push(context, MaterialPageRoute(builder: (context)=>LocationFetch()));
+            },
+            child: Row(
+              children: [
+                Icon(Icons.person,
+                  color: Color(0xff8f6152),),
+                Text('Location',
+                  style: TextStyle(
+                      fontFamily: GoogleFonts.lora().fontFamily
+                  ),)
+              ],
+            ),),
         ]
     );
   }

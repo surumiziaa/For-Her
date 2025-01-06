@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:for_her/Home/Home.dart';
 import 'package:lottie/lottie.dart';
-class Order extends StatefulWidget {
-  const Order({super.key});
+class OrderConformed extends StatefulWidget {
+  const OrderConformed({super.key});
 
   @override
-  State<Order> createState() => _OrderState();
+  State<OrderConformed> createState() => _OrderConformedState();
 }
 
-class _OrderState extends State<Order> {
+class _OrderConformedState extends State<OrderConformed> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -32,7 +32,7 @@ class _OrderState extends State<Order> {
                   Navigator.push(context, MaterialPageRoute(builder: (context)=>Home()));
                   },
                 color:Color(0xff057d05),
-              child: Text('Back'),
+              child: Text('Continue Shoping'),
               )
             ],
           ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:for_her/OrderConfirmed/OrderPage.dart';
+import 'package:for_her/CheckOut/OrderConfirmed.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -44,7 +44,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     setState(() {
                       payment = value;
                     });
-                    Navigator.push(context,MaterialPageRoute(builder: (context)=>Order()));
+                    Navigator.push(context,MaterialPageRoute(builder: (context)=>OrderConformed()));
                   },
                   title: Row(
                     children: [

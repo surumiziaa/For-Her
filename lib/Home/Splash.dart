@@ -33,6 +33,7 @@ bool ? finalData;
     var getData = preferences.getBool('islogged');
     setState(() {
       finalData = getData;
+
     });
   }
 

@@ -32,7 +32,8 @@ class _WishlistPageState extends State<WishlistPage> {
   // Fetch wishlist IDs from Firestore
   Future<void> _getWishlistIds() async {
     final user = FirebaseAuth.instance.currentUser;
-    final wishlistSnapshot = await FirebaseFirestore.instance.collection('Wishlist').where('userId', isEqualTo: user!.email).get();
+    final wishlistSnapshot = await FirebaseFirestore.instance.collection('Wishlist').
+    where('userId', isEqualTo: FirebaseAuth.instance.currentUser!.email).get();
     final ids = wishlistSnapshot.docs.map((doc) => doc.id).toList();
     setState(() {
       wishlistIds = ids;
@@ -70,45 +71,51 @@ class _WishlistPageState extends State<WishlistPage> {
         ),
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('Wishlist').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('Wishlist')
+            .where('userId', isEqualTo: FirebaseAuth.instance.currentUser!.email)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(
-                child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-                child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
+          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(child: Text('No items in your wishlist'));
           }
+
           return GridView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: snapshot.data!.docs.length,
             shrinkWrap: true,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 40,
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 20,
-                mainAxisExtent: 250.0
+              crossAxisCount: 2,
+              childAspectRatio: 40,
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 20,
+              mainAxisExtent: 250.0,
             ),
             itemBuilder: (BuildContext context, int index) {
               final snap = snapshot.data!.docs[index];
               final productId = snap['ProductId'];
-              bool isInWishlist = wishlistIds.contains(snap.id); // Check if the item is in wishlist
+              bool isInWishlist = wishlistIds.contains(snap.id);
               bool istocart = cartIds.contains(productId);
+
               return GestureDetector(
                 onTap: () {
-                      Navigator.pushNamed(context,  'wishview',arguments: {
-                        'ProductId': snap['ProductId'],
-                        'ProductName': snap['ProductName'],
-                        'image': snap['image'],
-                        'Price': snap['Price'],
-                        'Description': snap['Description'],
-                        'Brand': snap['Brand'],
-                        'Categories': snap['Categories'],
-                        'Rating': snap['Rating'],
-                        'Stock': snap['Stock'],
-                        'wishId': snap.id,
-                      });
+                  Navigator.pushNamed(context, 'wishview', arguments: {
+                    'ProductId': snap['ProductId'],
+                    'ProductName': snap['ProductName'],
+                    'image': snap['image'],
+                    'Price': snap['Price'],
+                    'Description': snap['Description'],
+                    'Brand': snap['Brand'],
+                    'Categories': snap['Categories'],
+                    'Rating': snap['Rating'],
+                    'Stock': snap['Stock'],
+                    'wishId': snap.id,
+                    'userId': FirebaseAuth.instance.currentUser!.email,
+                  });
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(left: 10.0),
@@ -117,7 +124,7 @@ class _WishlistPageState extends State<WishlistPage> {
                       borderRadius: BorderRadius.circular(25),
                       color: Color(0xff9fd5e0),
                     ),
-                    height:500,
+                    height: 500,
                     width: 100,
                     child: Column(
                       children: [
@@ -143,10 +150,11 @@ class _WishlistPageState extends State<WishlistPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             MaterialButton(
-                              onPressed: ()async{
-                                if(istocart == false){
-                                  try{
-                                    await FirebaseFirestore.instance.collection('Cart')
+                              onPressed: () async {
+                                if (!istocart) {
+                                  try {
+                                    await FirebaseFirestore.instance
+                                        .collection('Cart')
                                         .add({
                                       'ProductId': snap['ProductId'],
                                       'ProductName': snap['ProductName'],
@@ -157,45 +165,39 @@ class _WishlistPageState extends State<WishlistPage> {
                                       'Categories': snap['Categories'],
                                       'Rating': snap['Rating'],
                                       'Stock': snap['Stock'],
-                                      'userId': FirebaseAuth
-                                          .instance.currentUser!.email,
+                                      'userId': FirebaseAuth.instance.currentUser!.email,
                                     });
                                     setState(() {
                                       cartIds.add(snap['ProductId']);
-                                      istocart = cartIds.contains(snap['ProductId']);
                                     });
-                                  }
-                                  catch (e) {
+                                  } catch (e) {
                                     log(e.toString());
                                   }
-                                }else {
+                                } else {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            Cartt()
-                                    ),
+                                    MaterialPageRoute(builder: (context) => Cartt()),
                                   );
-
                                 }
                               },
                               color: Colors.white,
-                              child:Text(istocart ? 'Go to cart' : 'Add to cart'),
+                              child: Text(istocart ? 'Go to cart' : 'Add to cart'),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: IconButton(
-                                onPressed: () async{
-                                  await FirebaseFirestore.instance.collection('Wishlist').doc(snap.id).delete();
+                                onPressed: () async {
+                                  await FirebaseFirestore.instance
+                                      .collection('Wishlist')
+                                      .doc(snap.id)
+                                      .delete();
                                   setState(() {
-                                    isInWishlist=false;
+                                    isInWishlist = false;
                                   });
-                                  },
+                                },
                                 icon: Icon(
                                   Icons.favorite,
-                                  color: isInWishlist
-                                      ? Color(0xff7b0001)
-                                      : Colors.white, // Change color based on selection
+                                  color: isInWishlist ? Color(0xff7b0001) : Colors.white,
                                   size: 30.0,
                                 ),
                               ),
@@ -207,7 +209,6 @@ class _WishlistPageState extends State<WishlistPage> {
                   ),
                 ),
               );
-
             },
           );
         },
@@ -215,108 +216,3 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 }
-//
-// class ListContainerDesign extends StatefulWidget {
-//   ListContainerDesign({
-//     super.key,
-//     required this.onTap,
-//     required this.img,
-//     required this.proname,
-//     required this.rupee,
-//     required this.isInWishlist, // Added this parameter
-//   });
-//
-//   final Function? onTap;
-//   final ImageProvider img;
-//   final String proname;
-//   final String rupee;
-//   final bool isInWishlist; // Wishlist status
-//
-//   @override
-//   State<ListContainerDesign> createState() => _ListContainerDesignState();
-// }
-//
-// class _ListContainerDesignState extends State<ListContainerDesign> {
-//   bool isIconSelected = false;
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     isIconSelected = widget.isInWishlist;
-//     // [ Initialize icon selection based on wishlist status ]
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return GestureDetector(
-//       onTap: () => widget.onTap!(),
-//       child: Padding(
-//         padding: const EdgeInsets.only(left: 10.0),
-//         child: Container(
-//           decoration: BoxDecoration(
-//             borderRadius: BorderRadius.circular(25),
-//             color: Color(0xff9fd5e0),
-//           ),
-//           height:5,
-//           width: 100,
-//           child: Column(
-//             children: [
-//               SizedBox(height: 12),
-//               ClipRRect(
-//                 child: Image(
-//                   image: widget.img,
-//                   height: 280,
-//                   width: 170,
-//                   fit: BoxFit.cover,
-//                 ),
-//               ),
-//               Text(
-//                 widget.proname,
-//                 style: TextStyle(
-//                   overflow: TextOverflow.ellipsis,
-//                   fontSize: 20,
-//                   color: Colors.white,
-//                   fontWeight: FontWeight.w500,
-//                 ),
-//               ),
-//               Row(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   MaterialButton(
-//                     onPressed: () {},
-//                     color: Colors.white,
-//                     child: Text('Add to cart'),
-//                   ),
-//                   Padding(
-//                     padding: const EdgeInsets.only(left: 8.0),
-//                     child: IconButton(
-//                       onPressed: () async{
-//                         setState(() {
-//                           isIconSelected = !isIconSelected;
-//                           // Update wishlist status here
-//                         });
-//                         if(isIconSelected == true){
-//                           await FirebaseFirestore.instance.collection('Wishlist').doc(args['wishId']).delete();
-//                           setState(() {
-//                             isIconSelected=false;
-//                           });
-//                         }
-//                       },
-//                       icon: Icon(
-//                         Icons.favorite,
-//                         color: isIconSelected
-//                             ? Color(0xff7b0001)
-//                             : Colors.white, // Change color based on selection
-//                         size: 30.0,
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }

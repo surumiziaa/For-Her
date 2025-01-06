@@ -1,12 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:for_her/Adress/AddAdress.dart';
+import 'package:for_her/CheckOut/Singlecheckout.dart';
 import 'package:for_her/Firebase/firebase_options.dart';
 import 'package:for_her/MyCart/cartview.dart';
 import 'package:for_her/Wishlist/Removewish.dart';
 import 'package:for_her/product/productview.dart';
 import 'AddtoCart/Cart.dart';
-import 'Adress/EditAddress.dart';
+import 'Adress/add_singleadress.dart';
 import 'Home/Splash.dart';
 
 void main()async{
@@ -23,7 +23,8 @@ void main()async{
           'wishview'   :(context)=> Wishview(),
           'cartview'   :(context)=>Cartt(),
           'viewcart'   :(context)=>Cartview(),
-          'editaddress':(context)=>EditAddress(),
+          'singleaddress':(context)=>SingleAddress(),
+          "singlecheckout":(context)=>Buynow()
         },
       )
   );

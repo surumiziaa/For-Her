@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:for_her/AddtoCart/Cart.dart';
-import 'package:for_her/Mamaearth/MMProductdetailPage.dart';
+import 'package:for_her/CheckOut/Singlecheckout.dart';
 import 'package:readmore/readmore.dart';
 
 class Wishview extends StatefulWidget {
@@ -308,7 +308,7 @@ class _WishviewState extends State<Wishview> {
               color: Color(0xff8a92cd),
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => MamaearthDetail()));
+                    MaterialPageRoute(builder: (context) => Buynow()));
               },
               child: Text('Buy Now'),
             ),

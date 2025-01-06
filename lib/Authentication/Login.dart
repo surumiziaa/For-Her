@@ -99,8 +99,12 @@ class _LoginState extends State<Login> {
               ),
               MaterialButton(
                 onPressed: () {
-                  login();
-                },
+                 setState(() {
+                   login();
+                   Navigator.push(context, MaterialPageRoute(builder: (BuildContext)=>Home()));
+
+                 });
+                  },
                 color: Colors.teal[300],
                 child: Text('LOGIN'),
               ),
@@ -113,6 +117,7 @@ class _LoginState extends State<Login> {
                   MaterialButton(
                     onPressed: () {
                       sigin();
+
                     },
                     child: Image(
                       image: AssetImage('lib/images/img.png'),
@@ -164,6 +169,11 @@ class _LoginState extends State<Login> {
           email: email.text,
           password: password.text
       );
+      showDialog(context: context, builder:(context){
+        return AlertDialog(
+          content: Text('creatiion success'),
+        );
+      });
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               backgroundColor:Colors.teal[300],
@@ -172,10 +182,12 @@ class _LoginState extends State<Login> {
               ),
               content:Text('Login Successfull') )
       );
-      final SharedPreferences preferences =
-      await SharedPreferences.getInstance();
-      preferences.setBool('islogged', true);
+     setState(()async {
+       final SharedPreferences preferences =
+           await SharedPreferences.getInstance();
+       preferences.setBool('islogged', true);
 
+     });
       Navigator.push(context, MaterialPageRoute(builder: (BuildContext)=>Home()));
     } on FirebaseAuthException catch (e){
       ScaffoldMessenger.of(context).showSnackBar(

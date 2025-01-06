@@ -57,18 +57,20 @@ class _SignUpState extends State<SignUp> {
 
   String img = '';
 
-  Future<String> imgpick(File file) async {
+  Future<String> imgpick(File path) async {
     final firebase_storage.FirebaseStorage storage =
         firebase_storage.FirebaseStorage.instance;
     DateTime now = DateTime.now();
     String Timestamp = now.microsecondsSinceEpoch.toString();
     firebase_storage.Reference reference =
     storage.ref().child('images/$Timestamp');
-    firebase_storage.UploadTask task = reference.putFile(file);
+    firebase_storage.UploadTask task = reference.putFile(path);
     await task;
     String url = await reference.getDownloadURL();
     print(url);
-    img = url;
+    setState(() {
+      img = url;
+    });
 
     return img;
   }
@@ -110,8 +112,8 @@ class _SignUpState extends State<SignUp> {
                           if(pickedfile == null){
                             return;
                           }else{
-                            File file = File(pickedfile.path);
-                            img = await imgpick(file);
+                            File path = File(pickedfile.path);
+                            img = await imgpick(path);
                             setState(() {
 
                             });
@@ -267,6 +269,8 @@ class _SignUpState extends State<SignUp> {
           email: email.text,
           password: password.text
       );
+      Navigator.push(
+          context, MaterialPageRoute(builder: (BuildContext)=>Home()));
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               backgroundColor:Colors.teal[300],

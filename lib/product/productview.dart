@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:for_her/AddtoCart/Cart.dart';
-import 'package:for_her/Mamaearth/MMProductdetailPage.dart';
+import 'package:for_her/CheckOut/Singlecheckout.dart';
 import 'package:for_her/Wishlist/Wistlistpage.dart';
 import 'package:readmore/readmore.dart';
 
@@ -34,6 +34,33 @@ class _ProductViewState extends State<ProductView> {
 
   List<String> Quantity=['1','2','3','4','5','6','7','8','9','10'];
   String ?selected;
+
+
+
+  List addresslist = [];
+  List phonelist = [];
+  Future fetchAddress() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('SingleAddress')
+          .where('userId', isEqualTo: FirebaseAuth.instance.currentUser!.email)
+          .get();
+      List address = querySnapshot.docs.map((doc) => doc['address']).toList();
+      List phone = querySnapshot.docs.map((doc) => doc['phone']).toList();
+      setState(() {
+        addresslist = address;
+        phonelist = phone;
+      });
+    } catch (e) {
+      log('Error fetching data: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    fetchAddress();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +179,6 @@ class _ProductViewState extends State<ProductView> {
         actions: [
           IconButton(
             onPressed: () {
-
               if(iswish == false){
                setState(() {
                  addtoWishlist();
@@ -311,12 +337,32 @@ class _ProductViewState extends State<ProductView> {
             ),
             MaterialButton(
               minWidth: 100,
-              color: Color(0xff8a92cd),
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => MamaearthDetail()));
+             color:args['Stock']==0?Color(0xff8a92cd):Color(0xff8a92cd),
+              onPressed: (){
+                Navigator.pushNamed(context,  "singlecheckout",
+                     arguments: {
+                      'ProductId':args['ProductId'],
+                      'ProductName': args['ProductName'],
+                      'image': args['image'],
+                      'totalPrice': args['Price'].toString(),
+                      'Description': args['Description'],
+                      'Brand': args['Brand'],
+                      'Categories': args['Categories'],
+                      'Rating': args['Rating'],
+                      'Stock': args['Stock'],
+                      'address': addresslist.isEmpty
+                          ? "Add+Your+Address+for delivery"
+                          : addresslist[0],
+                      'phone': phonelist.isEmpty ? " " : phonelist[0],
+                      'userId': FirebaseAuth.instance.currentUser!.email,
+                    }
+                   );
               },
-              child: Text('Buy Now'),
+
+              child:Text(
+               args['Stock']==0?"Out of Stock":
+                "BUY NOW"
+              ),
             ),
           ],
         ),

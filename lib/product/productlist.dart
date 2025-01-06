@@ -13,7 +13,8 @@ NavigatorPage(context, pp) {
 
 class ProductList extends StatefulWidget {
   final String brand;
-  const ProductList({super.key, required this.brand});
+  const
+  ProductList({super.key, required this.brand});
 
   @override
   State<ProductList> createState() => _ProductListState();
@@ -208,8 +209,13 @@ class _ProductListState extends State<ProductList> {
                             'Categories': snap['Categories'],
                             'Rating': snap['Rating'],
                             'Stock': snap['Stock'],
+                            'userId':FirebaseAuth.instance.currentUser!.email,
                           },
                         );
+                        setState(() {
+                          cartProductIds.add(snap.id);
+                          wishlistProductIds.add(snap.id);
+                        });
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(left: 10.0),
@@ -262,7 +268,7 @@ class _ProductListState extends State<ProductList> {
                                                 .instance.currentUser!.email,
                                           });
                                           setState(() {
-                                            cartProductIds.add(snap.id);
+                                             cartProductIds.add(snap.id);
                                           });
                                         }
                                         catch (e) {
@@ -320,7 +326,8 @@ class _ProductListState extends State<ProductList> {
                                       },
                                       icon: Icon(
                                         Icons.favorite,
-                                        color: iswish
+                                        color:
+                                        iswish
                                             ? Color(0xff7b0001)
                                             : Colors.white, // Change color based on selection
                                         size: 30.0, // Customize the icon size
