@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:for_her/Core/utilities.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Tutorials extends StatefulWidget {
   const Tutorials({super.key});
@@ -8,58 +11,124 @@ class Tutorials extends StatefulWidget {
 }
 
 class _TutorialsState extends State<Tutorials> {
+  TextEditingController search = TextEditingController();
+  List<QueryDocumentSnapshot> availableCategories = [];
+  List<QueryDocumentSnapshot> filteredCategories = [];
 
-  List images=[
-    'lib/images/nybae.webp',
-    'lib/images/mamaearth.webp',
-    'lib/images/loreal.webp',
-    'lib/images/lakme.webp',
-    'lib/images/goodvibes.webp',
-    'lib/images/apls.webp',
-    'lib/images/maybe.webp',
-    'lib/images/minimalist.webp',
-    'lib/images/minimalist.webp',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    fetchCategories();
+  }
+
+  Future<void> fetchCategories() async {
+    FirebaseFirestore.instance.collection('youtube').snapshots().listen((snapshot) {
+      setState(() {
+        availableCategories = snapshot.docs;
+        filteredCategories = availableCategories; // Initially show all
+      });
+    });
+  }
+
+  void filterCategory(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        filteredCategories = availableCategories;
+      } else {
+        filteredCategories = availableCategories.where((doc) {
+          String category = doc['ProductName'].toString().toLowerCase();
+          return category.contains(query.toLowerCase());
+        }).toList();
+      }
+    });
+  }
+
+  Future<void> openYoutube(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return  Padding(
-      padding: const EdgeInsets.only(left: 12,right: 12),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height*0.9,
-        child: GridView.builder(
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: images.length,
-            shrinkWrap: true,
-            gridDelegate:SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                childAspectRatio: 10,
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 20,
-                mainAxisExtent: 250.0
-            ) ,
-            itemBuilder:(BuildContext ,int index){
-              return Container(
-                height: 300,
-                width: 150,
-                decoration:BoxDecoration(
-                  image: DecorationImage(
-                      image:AssetImage(images[index]),
-                    fit: BoxFit.cover )
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextFormField(
+              controller: search,
+              onChanged: filterCategory,
+              cursorColor: Color(0xff7b0001),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Search',
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(width: 2, color: Color(0xff7b0001)),
                 ),
-                child: IconButton(
-                  onPressed: (){},
-                  icon:Icon(
-                      Icons.play_circle_fill,
-              size:35,
-              color: Colors.white,
-                )
-                )
-              );
-            }
-        ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(width: 2, color: Color(0xff7b0001)),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: filteredCategories.isEmpty
+                  ? Center(child: Text("No results found"))
+                  : GridView.builder(
+                shrinkWrap: true,
+                itemCount: filteredCategories.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 20,
+                  mainAxisSpacing: 20,
+                  mainAxisExtent: 200.0,
+                ),
+                itemBuilder: (context, index) {
+                  final snap = filteredCategories[index];
+      
+                  return Column(
+                    children: [
+                      Container(
+                        height: 160,
+                        width: 400,
+                        decoration: BoxDecoration(
+                          color:pur,
+                          image: DecorationImage(
+                            image: NetworkImage(snap['image']),
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                        child: IconButton(
+                          onPressed: () async {
+                            String youtubeUrl = snap['Url'];
+                            if (youtubeUrl.isNotEmpty) {
+                              await openYoutube(youtubeUrl);
+                            } else {
+                              print("YouTube URL not found");
+                            }
+                          },
+                          icon: Icon(
+                            Icons.play_circle_fill,
+                            size: 35,
+                            color:Red,
+                          ),
+                        ),
+                      ),
+                      Text(snap['ProductName']),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
-

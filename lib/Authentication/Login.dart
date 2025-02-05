@@ -6,7 +6,6 @@ import 'package:for_her/Home/Home.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'Signup.dart';
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -116,9 +115,10 @@ class _LoginState extends State<Login> {
                 children: [
                   MaterialButton(
                     onPressed: () {
-                      sigin();
-
-                    },
+                      setState(() {
+                        sigin();
+                      });
+                      },
                     child: Image(
                       image: AssetImage('lib/images/img.png'),
                       height: 50,
@@ -182,12 +182,9 @@ class _LoginState extends State<Login> {
               ),
               content:Text('Login Successfull') )
       );
-     setState(()async {
-       final SharedPreferences preferences =
-           await SharedPreferences.getInstance();
-       preferences.setBool('islogged', true);
-
-     });
+      final SharedPreferences preferences =
+      await SharedPreferences.getInstance();
+      preferences.setBool('islogged', true);
       Navigator.push(context, MaterialPageRoute(builder: (BuildContext)=>Home()));
     } on FirebaseAuthException catch (e){
       ScaffoldMessenger.of(context).showSnackBar(
@@ -222,7 +219,8 @@ class _LoginState extends State<Login> {
             builder: (context) =>Home(),
           ));
     } catch (e) {
-      print("ERROR ::: $e");
+      print("ERROR ::::"
+          " $e");
       ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Color(0xffa91515),

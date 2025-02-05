@@ -8,6 +8,7 @@ import 'package:for_her/product/productview.dart';
 import 'AddtoCart/Cart.dart';
 import 'Adress/add_singleadress.dart';
 import 'Home/Splash.dart';
+import 'Search.dart';
 
 void main()async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +25,8 @@ void main()async{
           'cartview'   :(context)=>Cartt(),
           'viewcart'   :(context)=>Cartview(),
           'singleaddress':(context)=>SingleAddress(),
-          "singlecheckout":(context)=>Buynow()
+          "singlecheckout":(context)=>Buynow(),
+          'search' :(context)=>Search()
         },
       )
   );

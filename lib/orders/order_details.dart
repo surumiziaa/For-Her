@@ -164,54 +164,69 @@ class _OrderDetailsState extends State<OrderDetails> {
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
                               children: [
-                            MaterialButton(
-                              color: Colors.orangeAccent,
-                              onPressed: () async {
-                                // Parse the current expected date from the string format (dd/MM/yyyy)
-                                DateTime initialDate =
-                                DateFormat('dd/MM/yyyy')
-                                    .parse(snap['expected']);
+                                MaterialButton(
+                                  color: Colors.orangeAccent,
+                                  onPressed: () async {
+                                    try {
+                                      // Debug the current value of snap['expected']
+                                      print("snap['expected']: ${snap['expected']}");
 
-                                // Show DatePicker with the initial date and limit the selectable date range
-                                DateTime? newDate = await showDatePicker(
-                                  context: context,
-                                  firstDate: initialDate,
-                                  lastDate:
-                                  initialDate.add(Duration(days: 7)),
-                                  initialDate: initialDate,
-                                );
+                                      // Clean the date string by replacing double slashes with single slashes
+                                      String rawDate = snap['expected'].replaceAll('//', '/').trim();
 
-                                // If a new date is selected, format it to dd/MM/yyyy and update Firestore
-                                if (newDate != null) {
-                                  String formattedNewDate =
-                                  DateFormat('dd/MM/yyyy')
-                                      .format(newDate);
+                                      // Parse the cleaned date string
+                                      DateTime initialDate = DateFormat('dd/MM/yyyy').parse(rawDate);
 
-                                  // Update the Firestore document with the new delivery date
-                                  await FirebaseFirestore.instance
-                                      .collection('orders')
-                                      .doc(widget.orderId)
-                                      .update({
-                                    'expected': formattedNewDate,
-                                  });
+                                      // Define the date range
+                                      DateTime firstDate = initialDate;
+                                      DateTime lastDate = initialDate.add(Duration(days: 7));
 
-                                  // Show a SnackBar confirming the update
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text(
-                                            "Delivery date updated to $formattedNewDate")),
-                                  );
+                                      // Validate the date range
+                                      if (firstDate.isAfter(lastDate)) {
+                                        throw Exception("Invalid date range: firstDate is after lastDate");
+                                      }
 
-                                  // Refresh the UI
-                                  setState(() {});
-                                }
-                              },
+                                      // Show DatePicker with the initial date and limit the selectable date range
+                                      DateTime? newDate = await showDatePicker(
+                                        context: context,
+                                        initialDate: initialDate,
+                                        firstDate: firstDate,
+                                        lastDate: lastDate,
+                                      );
 
-                              child: Text(
-                                "Change Delivery Date",
-                              ),
-                            ),
-                            Spacer(),
+                                      // If a new date is selected, format it to dd/MM/yyyy and update Firestore
+                                      if (newDate != null) {
+                                        String formattedNewDate = DateFormat('dd/MM/yyyy').format(newDate);
+
+                                        // Update the Firestore document with the new delivery date
+                                        await FirebaseFirestore.instance
+                                            .collection('orders')
+                                            .doc(widget.orderId)
+                                            .update({'expected': formattedNewDate});
+
+                                        // Show a SnackBar confirming the update
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text("Delivery date updated to $formattedNewDate"),
+                                          ),
+                                        );
+
+                                        // Refresh the UI
+                                        setState(() {});
+                                      }
+                                    } catch (e) {
+                                      print("Error: $e");
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text("An error occurred: $e")),
+                                      );
+                                    }
+                                  },
+                                  child: Text(
+                                    "Change Delivery Date",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                                Spacer(),
                             MaterialButton(
                               onPressed: () {
                                 showDialog(
@@ -244,8 +259,8 @@ class _OrderDetailsState extends State<OrderDetails> {
                               ),
                             ),
                             Spacer(),
-                                                    ],
-                                                  ),
+                              ],
+                            ),
                           )
                           : height
                     ],

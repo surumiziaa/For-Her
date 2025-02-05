@@ -16,29 +16,6 @@ class _HomepageState extends State<Homepage> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: TextFormField(
-              cursorColor: Color(0xff8f6152),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                ),
-                hintText: 'Search Here',
-                enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: 2,
-                      color: Color(0xff8f6152),
-                    )
-                ),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: 2,
-                      color: Color(0xff8f6152),
-                    )
-                ),
-              ),
-            ),
-          ),
           Carousals(),
           SizedBox(height: 5,),
           Padding(

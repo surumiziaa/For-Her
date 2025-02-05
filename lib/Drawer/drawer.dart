@@ -149,20 +149,6 @@ class _DDState extends State<Drawerset> {
                 ),),
             ],
           ),),
-          PopupMenuItem(
-            onTap: (){
-              // Navigator.push(context, MaterialPageRoute(builder: (context)=>LocationFetch()));
-            },
-            child: Row(
-              children: [
-                Icon(Icons.person,
-                  color: Color(0xff8f6152),),
-                Text('Location',
-                  style: TextStyle(
-                      fontFamily: GoogleFonts.lora().fontFamily
-                  ),)
-              ],
-            ),),
         ]
     );
   }

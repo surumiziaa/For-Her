@@ -50,7 +50,7 @@ class _HomeState extends State<Home> {
             selectedColor:Color(0xff057d05)
             ),
             SalomonBottomBarItem(
-                icon:Icon(Icons.search_off) ,
+                icon:Icon(Icons.search) ,
                 title:Text('Search'),
             selectedColor:Color(0xff8a92cd),),
             SalomonBottomBarItem(

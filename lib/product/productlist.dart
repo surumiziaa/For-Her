@@ -194,7 +194,6 @@ class _ProductListState extends State<ProductList> {
                     final iswish = isInWishlist(snap.id);
                     final istocart =isInCart(snap.id);
                     return GestureDetector(
-                      
                       onTap: () {
                         Navigator.pushNamed(
                           context,

@@ -80,7 +80,8 @@ class _WishlistPageState extends State<WishlistPage> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
-          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          } else if (
+          snapshot.data!.docs.isEmpty) {
             return Center(child: Text('No items in your wishlist'));
           }
 
@@ -119,92 +120,97 @@ class _WishlistPageState extends State<WishlistPage> {
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(left: 10.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      color: Color(0xff9fd5e0),
-                    ),
-                    height: 500,
-                    width: 100,
-                    child: Column(
-                      children: [
-                        SizedBox(height: 12),
-                        ClipRRect(
-                          child: Image(
-                            image: NetworkImage(snap['image'][0]),
-                            height: 250,
-                            width: 170,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        Text(
-                          snap['ProductName'],
-                          style: TextStyle(
-                            overflow: TextOverflow.ellipsis,
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            MaterialButton(
-                              onPressed: () async {
-                                if (!istocart) {
-                                  try {
-                                    await FirebaseFirestore.instance
-                                        .collection('Cart')
-                                        .add({
-                                      'ProductId': snap['ProductId'],
-                                      'ProductName': snap['ProductName'],
-                                      'image': snap['image'],
-                                      'Price': snap['Price'],
-                                      'Description': snap['Description'],
-                                      'Brand': snap['Brand'],
-                                      'Categories': snap['Categories'],
-                                      'Rating': snap['Rating'],
-                                      'Stock': snap['Stock'],
-                                      'userId': FirebaseAuth.instance.currentUser!.email,
-                                    });
-                                    setState(() {
-                                      cartIds.add(snap['ProductId']);
-                                    });
-                                  } catch (e) {
-                                    log(e.toString());
-                                  }
-                                } else {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => Cartt()),
-                                  );
-                                }
-                              },
-                              color: Colors.white,
-                              child: Text(istocart ? 'Go to cart' : 'Add to cart'),
+                  child: Card(
+                    color: Colors.white,
+                    elevation: 20,
+                    shadowColor: Colors.blueGrey,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        color:Colors.white
+                      ),
+                      height: 500,
+                      width: 100,
+                      child: Column(
+                        children: [
+                          SizedBox(height: 12),
+                          ClipRRect(
+                            child: Image(
+                              image: NetworkImage(snap['image'][0]),
+                              height: 250,
+                              width: 170,
+                              fit: BoxFit.cover,
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: IconButton(
+                          ),
+                          Text(
+                            snap['ProductName'],
+                            style: TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              MaterialButton(
                                 onPressed: () async {
-                                  await FirebaseFirestore.instance
-                                      .collection('Wishlist')
-                                      .doc(snap.id)
-                                      .delete();
-                                  setState(() {
-                                    isInWishlist = false;
-                                  });
+                                  if (!istocart) {
+                                    try {
+                                      await FirebaseFirestore.instance
+                                          .collection('Cart')
+                                          .add({
+                                        'ProductId': snap['ProductId'],
+                                        'ProductName': snap['ProductName'],
+                                        'image': snap['image'],
+                                        'Price': snap['Price'],
+                                        'Description': snap['Description'],
+                                        'Brand': snap['Brand'],
+                                        'Categories': snap['Categories'],
+                                        'Rating': snap['Rating'],
+                                        'Stock': snap['Stock'],
+                                        'userId': FirebaseAuth.instance.currentUser!.email,
+                                      });
+                                      setState(() {
+                                        cartIds.add(snap['ProductId']);
+                                      });
+                                    } catch (e) {
+                                      log(e.toString());
+                                    }
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => Cartt()),
+                                    );
+                                  }
                                 },
-                                icon: Icon(
-                                  Icons.favorite,
-                                  color: isInWishlist ? Color(0xff7b0001) : Colors.white,
-                                  size: 30.0,
+                                color: Colors.white,
+                                child: Text(istocart ? 'Go to cart' : 'Add to cart'),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: IconButton(
+                                  onPressed: () async {
+                                    await FirebaseFirestore.instance
+                                        .collection('Wishlist')
+                                        .doc(snap.id)
+                                        .delete();
+                                    setState(() {
+                                      isInWishlist = false;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    Icons.favorite,
+                                    color: isInWishlist ? Color(0xff7b0001) : Colors.white,
+                                    size: 30.0,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

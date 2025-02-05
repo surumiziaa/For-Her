@@ -35,6 +35,10 @@ class _OrderScreenState extends State<OrderScreen> {
               return Center(
                   child: CircularProgressIndicator()
               );
+            }else if(!snapshot.hasData ||snapshot.data!.docs.isEmpty){
+              return Text("No data",style: TextStyle(
+                color: Colors.black
+              ),);
             }
               return ListView.builder(
                 itemCount:snapshot.data!.docs.length,

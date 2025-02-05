@@ -16,7 +16,7 @@ class _OrderConformedState extends State<OrderConformed> {
           body: Column(
             children: [
               Center(
-                child: Lottie.asset('assets/animation/animation.json',
+                child: Lottie.asset('assets/animation/test.json',
                 repeat: true,
                 width: 300,
                 height:350,
